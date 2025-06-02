@@ -1,0 +1,3576 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonorDarah.id - Satu Donor, Sejuta Harapan</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e63946;
+            --primary-dark: #d00000;
+            --secondary: #457b9d;
+            --dark: #1d3557;
+            --light: #f1faee;
+            --background: #ffffff;
+            --text: #333333;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --info: #2196f3;
+        }
+
+        [data-theme="dark"] {
+            --background: #121212;
+            --text: #f1faee;
+            --card-bg: #1e1e1e;
+            --shadow: rgba(255, 255, 255, 0.05);
+            --dark: #a8dadc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: white;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons .btn {
+            margin-left: 10px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary);
+            padding: 1rem;
+            transform: translateY(-150%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 999;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+        }
+
+        .mobile-menu li {
+            margin-bottom: 1rem;
+        }
+
+        .mobile-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 0.5rem 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #3a6a8a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-dark {
+            background-color: var(--dark);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background-color: #14213d;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            padding-bottom: 2rem;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Emergency Section */
+        .emergency-section {
+            background-color: #fff3f3;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        [data-theme="dark"] .emergency-section {
+            background-color: #2a1a1a;
+        }
+
+        .emergency-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-header i {
+            color: var(--danger);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .emergency-header h2 {
+            color: var(--danger);
+        }
+
+        .emergency-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .emergency-card {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--danger);
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .emergency-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--danger);
+        }
+
+        .emergency-card p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .emergency-card .blood-type {
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        /* Education Section */
+        .education-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .education-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .education-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .education-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .education-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .education-card-content {
+            padding: 1.2rem;
+        }
+
+        .education-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .education-card p {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        /* Auth Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--background);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px var(--shadow);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text);
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            opacity: 1;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .form-footer p {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            margin-right: 1.5rem;
+            font-weight: bold;
+        }
+
+        .profile-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .profile-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-card h3 i {
+            margin-right: 10px;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-item label {
+            font-weight: 500;
+            color: var(--text);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-item p {
+            font-size: 1rem;
+        }
+
+        .donor-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .donor-status-info h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .donor-status-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .countdown {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        /* Donor Search Section */
+        .donor-search-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .search-filters {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .donor-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .donor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .donor-card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .donor-blood-type {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .donor-card-body {
+            padding: 1.5rem;
+        }
+
+        .donor-info {
+            margin-bottom: 1rem;
+        }
+
+        .donor-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .donor-info p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .donor-info i {
+            margin-right: 8px;
+            color: var(--secondary);
+        }
+
+        .donor-status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .status-available {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .status-unavailable {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .donor-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        /* Blood Request Section */
+        .blood-request-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .request-form {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .request-history {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .request-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        [data-theme="dark"] .request-item {
+            border-bottom: 1px solid #444;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .request-blood-type {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .request-status {
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .status-rejected {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .request-item-details p {
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        /* Notification Section */
+        .notification-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .notification-card {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+
+        .notification-content h4 {
+            margin-bottom: 0.3rem;
+            color: var(--primary);
+        }
+
+        .notification-content p {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        [data-theme="dark"] .notification-time {
+            color: #aaa;
+        }
+
+        /* Gamification Section */
+        .gamification-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .badges-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .badge-card {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .badge-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .badge-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge-card p {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        [data-theme="dark"] .badge-card p {
+            color: #aaa;
+        }
+
+        .badge-earned {
+            background-color: rgba(69, 123, 157, 0.1);
+        }
+
+        .badge-earned .badge-icon {
+            color: var(--primary);
+        }
+
+        .leaderboard-container {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            padding: 0.8rem;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .leaderboard-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        [data-theme="dark"] .leaderboard-table td {
+            border-bottom: 1px solid #444;
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover {
+            background-color: rgba(69, 123, 157, 0.1);
+        }
+
+        .user-rank {
+            display: flex;
+            align-items: center;
+        }
+
+        .rank-1, .rank-2, .rank-3 {
+            font-weight: bold;
+        }
+
+        .rank-1 {
+            color: gold;
+        }
+
+        .rank-2 {
+            color: silver;
+        }
+
+        .rank-3 {
+            color: #cd7f32; /* bronze */
+        }
+
+        /* Map Section */
+        .map-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        #donor-map {
+            height: 500px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .map-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .map-legend {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .event-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .event-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .event-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .event-card-content {
+            padding: 1.2rem;
+        }
+
+        .event-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .event-card p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .event-date {
+            display: flex;
+            align-items: center;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .event-date i {
+            margin-right: 8px;
+        }
+
+        /* QR Code Section */
+        .qrcode-section {
+            display: none;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .qrcode-card {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            display: inline-block;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .qrcode-container {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: white;
+            display: inline-block;
+            border-radius: 5px;
+        }
+
+        .qrcode-info {
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .qrcode-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Statistics Section */
+        .statistics-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Chat Section */
+        .chat-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .chat-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .chat-messages {
+            padding: 1.5rem;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            max-width: 70%;
+        }
+
+        .message.received {
+            margin-right: auto;
+        }
+
+        .message.sent {
+            margin-left: auto;
+        }
+
+        .message-content {
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .message.received .message-content {
+            background-color: #f0f0f0;
+            color: var(--text);
+            border-bottom-left-radius: 0;
+        }
+
+        [data-theme="dark"] .message.received .message-content {
+            background-color: #2a2a2a;
+        }
+
+        .message.sent .message-content {
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+
+        .message-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            color: #777;
+        }
+
+        [data-theme="dark"] .message-info {
+            color: #aaa;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            background-color: var(--card-bg);
+        }
+
+        [data-theme="dark"] .chat-input {
+            border-top: 1px solid #444;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        .chat-input button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 999;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow);
+            z-index: 999;
+        }
+
+        .language-menu {
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+            padding: 0.5rem;
+            display: none;
+        }
+
+        .language-menu.active {
+            display: block;
+        }
+
+        .language-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .language-option:hover {
+            background-color: rgba(69, 123, 157, 0.1);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .accordion {
+            margin-bottom: 1.5rem;
+        }
+
+        .accordion-item {
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px var(--shadow);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .accordion-header:hover {
+            background-color: rgba(69, 123, 157, 0.1);
+        }
+
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-item.active .accordion-content {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 1000px;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .contact-info {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .contact-info h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .contact-icon {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-right: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        .contact-form {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .nav-links, .auth-buttons {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .donor-status {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .countdown {
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                height: 400px;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                padding: 0.8rem;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .tab.active {
+                border-bottom: 2px solid var(--primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-tint"></i>
+                <span>DonorDarah.id</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link active" data-section="home">Beranda</a></li>
+                    <li><a href="#" class="nav-link" data-section="donor-search">Cari Pendonor</a></li>
+                    <li><a href="#" class="nav-link" data-section="blood-request">Permintaan Darah</a></li>
+                    <li><a href="#" class="nav-link" data-section="map">Lokasi & Event</a></li>
+                    <li><a href="#" class="nav-link" data-section="faq">Edukasi</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="login-btn">Masuk</button>
+                <button class="btn btn-primary" id="register-btn">Daftar</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="home">Beranda</a></li>
+                <li><a href="#" class="nav-link" data-section="donor-search">Cari Pendonor</a></li>
+                <li><a href="#" class="nav-link" data-section="blood-request">Permintaan Darah</a></li>
+                <li><a href="#" class="nav-link" data-section="map">Lokasi & Event</a></li>
+                <li><a href="#" class="nav-link" data-section="faq">Edukasi</a></li>
+                <li><a href="#" class="nav-link" id="mobile-login-btn">Masuk</a></li>
+                <li><a href="#" class="nav-link" id="mobile-register-btn">Daftar</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section class="home-section" id="home-section">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Satu Donor, Sejuta Harapan</h1>
+                    <p>Bergabunglah dengan komunitas kami dan bantu selamatkan nyawa dengan menjadi pendonor darah</p>
+                    <button class="btn btn-primary btn-lg" id="donate-now-btn">Donor Sekarang</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <!-- Emergency Section -->
+                <div class="emergency-section">
+                    <div class="emergency-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Permintaan Darah Mendesak</h2>
+                    </div>
+                    <div class="emergency-cards">
+                        <div class="emergency-card">
+                            <h3>RS Umum Daerah Kota</h3>
+                            <p><span class="blood-type">Golongan A+</span> dibutuhkan segera</p>
+                            <p>Pasien: Ibu Sinta (Operasi Jantung)</p>
+                            <p>Lokasi: Jl. Kesehatan No. 123</p>
+                            <p>Kontak: 0812-3456-7890</p>
+                        </div>
+                        <div class="emergency-card">
+                            <h3>RS Siloam</h3>
+                            <p><span class="blood-type">Golongan AB-</span> dibutuhkan segera</p>
+                            <p>Pasien: Bayi prematur (Transfusi)</p>
+                            <p>Lokasi: Jl. Mawar No. 45</p>
+                            <p>Kontak: 0813-4567-8901</p>
+                        </div>
+                        <div class="emergency-card">
+                            <h3>RS Harapan Kita</h3>
+                            <p><span class="blood-type">Golongan O+</span> dibutuhkan segera</p>
+                            <p>Pasien: Kecelakaan lalu lintas</p>
+                            <p>Lokasi: Jl. Melati No. 67</p>
+                            <p>Kontak: 0814-5678-9012</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Section -->
+                <div class="education-section">
+                    <div class="section-header">
+                        <h2>Edukasi Donor Darah</h2>
+                        <a href="#" class="btn btn-outline" data-section="faq">Lihat Semua</a>
+                    </div>
+                    <div class="education-cards">
+                        <div class="education-card">
+                            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Manfaat Donor Darah">
+                            <div class="education-card-content">
+                                <h3>Manfaat Donor Darah</h3>
+                                <p>Donor darah tidak hanya menyelamatkan nyawa orang lain tetapi juga memberikan manfaat kesehatan bagi pendonor...</p>
+                                <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                        <div class="education-card">
+                            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Syarat Donor Darah">
+                            <div class="education-card-content">
+                                <h3>Syarat Donor Darah</h3>
+                                <p>Ketahui syarat-syarat yang harus dipenuhi sebelum melakukan donor darah untuk memastikan keamanan dan kesehatan...</p>
+                                <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                        <div class="education-card">
+                            <img src="https://images.unsplash.com/photo-1581595219315-a187dd40c322?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Proses Donor Darah">
+                            <div class="education-card-content">
+                                <h3>Proses Donor Darah</h3>
+                                <p>Pelajari tahapan lengkap proses donor darah dari pendaftaran hingga setelah donor untuk mempersiapkan diri...</p>
+                                <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section class="profile-section" id="profile-section">
+            <div class="container">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">JD</div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">John Doe</h2>
+                        <p id="profile-blood-type">Golongan Darah: A+</p>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="profile-card">
+                        <h3><i class="fas fa-user"></i> Informasi Pribadi</h3>
+                        <div class="detail-item">
+                            <label>Nama Lengkap</label>
+                            <p id="profile-fullname">John Doe</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Tanggal Lahir</label>
+                            <p id="profile-birthdate">15 Januari 1990 (33 tahun)</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Jenis Kelamin</label>
+                            <p id="profile-gender">Laki-laki</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Alamat</label>
+                            <p id="profile-address">Jl. Contoh No. 123, Jakarta Selatan</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Kontak</label>
+                            <p id="profile-contact">0812-3456-7890 | john.doe@example.com</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3><i class="fas fa-heartbeat"></i> Informasi Kesehatan</h3>
+                        <div class="detail-item">
+                            <label>Golongan Darah</label>
+                            <p id="profile-blood">A+</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Berat Badan</label>
+                            <p id="profile-weight">68 kg</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Riwayat Penyakit</label>
+                            <p id="profile-medical-history">Tidak ada</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status Donor Terakhir</label>
+                            <p id="profile-last-donation">15 Mei 2023</p>
+                        </div>
+                        <div class="detail-item">
+                            <label>Total Donor</label>
+                            <p id="profile-total-donations">5 kali</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <h3><i class="fas fa-calendar-check"></i> Status Donor</h3>
+                    <div class="donor-status">
+                        <div class="donor-status-info">
+                            <h4>Anda bisa donor darah lagi pada:</h4>
+                            <p>Setelah 75 hari sejak donor terakhir (15 Mei 2023)</p>
+                        </div>
+                        <div class="countdown" id="countdown">
+                            28 hari lagi
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donor Search Section -->
+        <section class="donor-search-section" id="donor-search-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Cari Pendonor Darah</h2>
+                </div>
+
+                <div class="search-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="blood-type-filter">Golongan Darah</label>
+                            <select id="blood-type-filter" class="form-control">
+                                <option value="">Semua Golongan</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="location-filter">Lokasi</label>
+                            <select id="location-filter" class="form-control">
+                                <option value="">Semua Lokasi</option>
+                                <option value="jakarta">Jakarta</option>
+                                <option value="bandung">Bandung</option>
+                                <option value="surabaya">Surabaya</option>
+                                <option value="yogyakarta">Yogyakarta</option>
+                                <option value="bali">Bali</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="availability-filter">Ketersediaan</label>
+                            <select id="availability-filter" class="form-control">
+                                <option value="">Semua Status</option>
+                                <option value="available">Tersedia Donor</option>
+                                <option value="unavailable">Belum Bisa Donor</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary" id="search-btn">Cari Pendonor</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-results" id="search-results">
+                    <!-- Donor cards will be populated here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Blood Request Section -->
+        <section class="blood-request-section" id="blood-request-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Permintaan Darah</h2>
+                </div>
+
+                <div class="request-form">
+                    <h3>Buat Permintaan Darah Baru</h3>
+                    <form id="blood-request-form">
+                        <div class="form-group">
+                            <label for="request-blood-type">Golongan Darah yang Dibutuhkan</label>
+                            <select id="request-blood-type" class="form-control" required>
+                                <option value="">Pilih Golongan Darah</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                            <div class="error-message" id="blood-type-error">Golongan darah harus dipilih</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="request-quantity">Jumlah yang Dibutuhkan (kantong)</label>
+                            <input type="number" id="request-quantity" class="form-control" min="1" required>
+                            <div class="error-message" id="quantity-error">Masukkan jumlah yang valid</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="request-hospital">Rumah Sakit/Lokasi</label>
+                            <input type="text" id="request-hospital" class="form-control" required>
+                            <div class="error-message" id="hospital-error">Masukkan nama rumah sakit/lokasi</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="request-patient">Nama Pasien (opsional)</label>
+                            <input type="text" id="request-patient" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="request-diagnosis">Diagnosis/Keadaan (opsional)</label>
+                            <textarea id="request-diagnosis" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="request-contact">Kontak yang Bisa Dihubungi</label>
+                            <input type="text" id="request-contact" class="form-control" required>
+                            <div class="error-message" id="contact-error">Masukkan kontak yang valid</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="request-urgency">Tingkat Urgensi</label>
+                            <select id="request-urgency" class="form-control" required>
+                                <option value="normal">Normal (1-2 hari)</option>
+                                <option value="urgent">Mendesak (kurang dari 12 jam)</option>
+                                <option value="emergency">Darurat (segera)</option>
+                            </select>
+                        </div>
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-primary">Kirim Permintaan</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="request-history">
+                    <h3>Riwayat Permintaan Darah</h3>
+                    <div id="request-history-list">
+                        <!-- Request history will be populated here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notification Section -->
+        <section class="notification-section" id="notification-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Notifikasi & Pengingat</h2>
+                </div>
+
+                <div class="notification-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>Pengingat Donor Darah</h4>
+                        <p>Anda dapat melakukan donor darah lagi dalam 28 hari. Mari bantu mereka yang membutuhkan!</p>
+                        <p class="notification-time">1 jam yang lalu</p>
+                    </div>
+                </div>
+
+                <div class="notification-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>Permintaan Darah Baru</h4>
+                        <p>Ada permintaan darah golongan A+ di RS Harapan Kita. Bantu sebarkan informasi ini!</p>
+                        <p class="notification-time">3 jam yang lalu</p>
+                    </div>
+                </div>
+
+                <div class="notification-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>Pencapaian Baru</h4>
+                        <p>Selamat! Anda telah mencapai level "Donor Aktif" dengan 5 kali donor darah.</p>
+                        <p class="notification-time">1 hari yang lalu</p>
+                    </div>
+                </div>
+
+                <div class="notification-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>Event Donor Darah</h4>
+                        <p>Event donor darah akan diselenggarakan di Mall Central Park pada 15 Agustus 2023. Daftar sekarang!</p>
+                        <p class="notification-time">2 hari yang lalu</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gamification Section -->
+        <section class="gamification-section" id="gamification-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Gamifikasi Donor Darah</h2>
+                </div>
+
+                <h3>Badges Anda</h3>
+                <div class="badges-container">
+                    <div class="badge-card badge-earned">
+                        <div class="badge-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4>Donor Pertama</h4>
+                        <p>Donor darah pertama kali</p>
+                    </div>
+                    <div class="badge-card badge-earned">
+                        <div class="badge-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h4>Donor 3x</h4>
+                        <p>Menyelesaikan 3 kali donor</p>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h4>Donor 5x</h4>
+                        <p>Menyelesaikan 5 kali donor</p>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h4>Donor Rutin</h4>
+                        <p>Donor 3x dalam setahun</p>
+                    </div>
+                    <div class="badge-card badge-earned">
+                        <div class="badge-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4>Donor Darurat</h4>
+                        <p>Donor untuk kasus darurat</p>
+                    </div>
+                    <div class="badge-card">
+                        <div class="badge-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Rekrut Teman</h4>
+                        <p>Mengajak 3 teman donor</p>
+                    </div>
+                </div>
+
+                <h3>Leaderboard</h3>
+                <div class="leaderboard-container">
+                    <div class="leaderboard-header">
+                        <h4>Top Pendonor Bulan Ini</h4>
+                        <select class="form-control" style="width: auto;">
+                            <option>Bulan Ini</option>
+                            <option>3 Bulan Terakhir</option>
+                            <option>Tahun Ini</option>
+                            <option>Sepanjang Masa</option>
+                        </select>
+                    </div>
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Peringkat</th>
+                                <th>Nama</th>
+                                <th>Donor</th>
+                                <th>Poin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="rank-1">1</td>
+                                <td class="user-rank">
+                                    <div class="profile-avatar" style="width: 30px; height: 30px; font-size: 0.8rem; margin-right: 10px;">SB</div>
+                                    Sarah Budi
+                                </td>
+                                <td>8</td>
+                                <td>1200</td>
+                            </tr>
+                            <tr>
+                                <td class="rank-2">2</td>
+                                <td class="user-rank">
+                                    <div class="profile-avatar" style="width: 30px; height: 30px; font-size: 0.8rem; margin-right: 10px;">AW</div>
+                                    Andi Wijaya
+                                </td>
+                                <td>7</td>
+                                <td>1050</td>
+                            </tr>
+                            <tr>
+                                <td class="rank-3">3</td>
+                                <td class="user-rank">
+                                    <div class="profile-avatar" style="width: 30px; height: 30px; font-size: 0.8rem; margin-right: 10px;">DS</div>
+                                    Dian Sari
+                                </td>
+                                <td>6</td>
+                                <td>900</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td class="user-rank">
+                                    <div class="profile-avatar" style="width: 30px; height: 30px; font-size: 0.8rem; margin-right: 10px;">JD</div>
+                                    John Doe (Anda)
+                                </td>
+                                <td>5</td>
+                                <td>750</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td class="user-rank">
+                                    <div class="profile-avatar" style="width: 30px; height: 30px; font-size: 0.8rem; margin-right: 10px;">RS</div>
+                                    Rina Susanti
+                                </td>
+                                <td>4</td>
+                                <td>600</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-section" id="map-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Peta Pendonor & Event Donor Darah</h2>
+                </div>
+
+                <div class="map-controls">
+                    <div>
+                        <button class="btn btn-secondary" id="show-donors-btn">
+                            <i class="fas fa-user"></i> Tampilkan Pendonor
+                        </button>
+                        <button class="btn btn-secondary" id="show-events-btn">
+                            <i class="fas fa-calendar-alt"></i> Tampilkan Event
+                        </button>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #e63946;"></div>
+                            <span>Pendonor</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #457b9d;"></div>
+                            <span>Event Donor</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="donor-map"></div>
+
+                <h3>Event Donor Darah Terdekat</h3>
+                <div class="event-list">
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Event Donor Darah">
+                        <div class="event-card-content">
+                            <h3>Donor Darah Bulanan PMI</h3>
+                            <p>Donor darah rutin yang diselenggarakan oleh Palang Merah Indonesia</p>
+                            <p><i class="fas fa-map-marker-alt"></i> Kantor PMI Jakarta Pusat</p>
+                            <p class="event-date">
+                                <i class="far fa-calendar-alt"></i> 15 Agustus 2023, 08:00 - 15:00
+                            </p>
+                            <button class="btn btn-primary">Daftar Sekarang</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1584466977773-e625c37cdd50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Event Donor Darah">
+                        <div class="event-card-content">
+                            <h3>Blood For Life</h3>
+                            <p>Event donor darah untuk memperingati Hari Donor Darah Sedunia</p>
+                            <p><i class="fas fa-map-marker-alt"></i> Mall Central Park, Jakarta Barat</p>
+                            <p class="event-date">
+                                <i class="far fa-calendar-alt"></i> 25 Agustus 2023, 10:00 - 18:00
+                            </p>
+                            <button class="btn btn-primary">Daftar Sekarang</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Event Donor Darah">
+                        <div class="event-card-content">
+                            <h3>Aksi Donor Darah Kampus</h3>
+                            <p>Donor darah untuk memenuhi kebutuhan stok darah di rumah sakit pendidikan</p>
+                            <p><i class="fas fa-map-marker-alt"></i> Universitas Indonesia, Depok</p>
+                            <p class="event-date">
+                                <i class="far fa-calendar-alt"></i> 5 September 2023, 09:00 - 16:00
+                            </p>
+                            <button class="btn btn-primary">Daftar Sekarang</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QR Code Section -->
+        <section class="qrcode-section" id="qrcode-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Kartu Pendonor Digital</h2>
+                </div>
+
+                <div class="qrcode-card">
+                    <h3>Scan QR Code ini untuk melihat informasi pendonor</h3>
+                    <div class="qrcode-container" id="qrcode-container">
+                        <!-- QR Code will be generated here -->
+                    </div>
+                    <button class="btn btn-primary" id="download-qr-btn">
+                        <i class="fas fa-download"></i> Download QR Code
+                    </button>
+                    <div class="qrcode-info">
+                        <p><strong>Nama:</strong> John Doe</p>
+                        <p><strong>Golongan Darah:</strong> A+</p>
+                        <p><strong>Terakhir Donor:</strong> 15 Mei 2023</p>
+                        <p><strong>Status:</strong> Aktif (bisa donor dalam 28 hari)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section class="statistics-section" id="statistics-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Statistik Donor Darah</h2>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-header">Permintaan Darah per Golongan</h3>
+                    <canvas id="blood-type-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-header">Donor Aktif per Wilayah</h3>
+                    <canvas id="region-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section class="chat-section" id="chat-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Chat dengan Penerima Donor</h2>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h3>Chat dengan Sarah Budi</h3>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message received">
+                            <div class="message-content">
+                                Hai John, terima kasih sudah bersedia menjadi donor untuk ayah saya
+                            </div>
+                            <div class="message-info">
+                                <span>Sarah Budi</span>
+                                <span>10:30 AM</span>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-content">
+                                Sama-sama Sarah, senang bisa membantu. Kapan ayahmu membutuhkan donor darah?
+                            </div>
+                            <div class="message-info">
+                                <span>Anda</span>
+                                <span>10:32 AM</span>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-content">
+                                Operasi dijadwalkan besok jam 9 pagi di RS Harapan Kita. Apakah Anda bisa datang jam 8?
+                            </div>
+                            <div class="message-info">
+                                <span>Sarah Budi</span>
+                                <span>10:33 AM</span>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-content">
+                                Baik, saya akan datang jam 8 besok. Semoga operasinya lancar
+                            </div>
+                            <div class="message-info">
+                                <span>Anda</span>
+                                <span>10:35 AM</span>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-content">
+                                Terima kasih banyak John. Saya sangat berterima kasih 🙏
+                            </div>
+                            <div class="message-info">
+                                <span>Sarah Budi</span>
+                                <span>10:36 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Ketik pesan..." id="chat-input">
+                        <button id="send-message-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Edukasi & FAQ Donor Darah</h2>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Syarat-syarat untuk menjadi pendonor darah</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Untuk menjadi pendonor darah, Anda harus memenuhi persyaratan berikut:</p>
+                            <ul>
+                                <li>Usia 17-65 tahun</li>
+                                <li>Berat badan minimal 45 kg</li>
+                                <li>Tekanan darah normal (sistolik 100-180 mmHg, diastolik 60-100 mmHg)</li>
+                                <li>Kadar hemoglobin minimal 12,5 g/dL untuk wanita dan 13,5 g/dL untuk pria</li>
+                                <li>Tidak sedang sakit atau mengonsumsi obat tertentu</li>
+                                <li>Interval donor minimal 3 bulan (12 minggu) untuk pria dan 4 bulan (16 minggu) untuk wanita</li>
+                                <li>Tidak memiliki riwayat penyakit tertentu seperti hepatitis B/C, HIV/AIDS, sifilis, dll.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Manfaat donor darah bagi kesehatan</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Donor darah tidak hanya bermanfaat bagi penerima, tetapi juga memberikan manfaat kesehatan bagi pendonor:</p>
+                            <ul>
+                                <li>Mengurangi risiko penyakit jantung dan pembuluh darah</li>
+                                <li>Merangsang produksi sel darah baru</li>
+                                <li>Membantu mengurangi kelebihan zat besi dalam darah</li>
+                                <li>Mendapat pemeriksaan kesehatan gratis sebelum donor</li>
+                                <li>Meningkatkan psikologis karena membantu sesama</li>
+                                <li>Membakar kalori (sekitar 650 kalori per donor)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Persiapan sebelum donor darah</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Agar proses donor darah berjalan lancar, lakukan persiapan berikut:</p>
+                            <ul>
+                                <li>Tidur yang cukup minimal 7 jam sebelum donor</li>
+                                <li>Makan makanan bergizi 3-4 jam sebelum donor</li>
+                                <li>Minum air putih yang cukup sebelum dan sesudah donor</li>
+                                <li>Hindari makanan berlemak tinggi sebelum donor</li>
+                                <li>Jangan merokok 2 jam sebelum dan sesudah donor</li>
+                                <li>Bawa identitas diri yang masih berlaku</li>
+                                <li>Kenakan pakaian yang memudahkan akses ke lengan</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Prosedur donor darah</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Proses donor darah biasanya memakan waktu sekitar 1 jam dengan tahapan berikut:</p>
+                            <ol>
+                                <li><strong>Pendaftaran:</strong> Mengisi formulir dan menunjukkan identitas</li>
+                                <li><strong>Pemeriksaan awal:</strong> Pengukuran berat badan, tekanan darah, dan kadar hemoglobin</li>
+                                <li><strong>Wawancara medis:</strong> Pemeriksaan riwayat kesehatan oleh petugas</li>
+                                <li><strong>Donor darah:</strong> Pengambilan darah selama 5-10 menit (350-450 mL)</li>
+                                <li><strong>Istirahat:</strong> Beristirahat sambil menikmati makanan/minuman yang disediakan</li>
+                                <li><strong>Pulang:</strong> Anda akan diberikan kartu donor dan saran pasca donor</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Perawatan setelah donor darah</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Setelah donor darah, lakukan hal berikut untuk pemulihan optimal:</p>
+                            <ul>
+                                <li>Istirahat selama 10-15 menit sebelum berdiri</li>
+                                <li>Minum banyak cairan untuk menggantikan volume darah</li>
+                                <li>Hindari aktivitas berat selama 24 jam setelah donor</li>
+                                <li>Jangan merokok selama 2 jam setelah donor</li>
+                                <li>Jangan mengangkat beban berat dengan lengan yang digunakan untuk donor</li>
+                                <li>Makan makanan bergizi tinggi zat besi</li>
+                                <li>Jika merasa pusing, berbaring dengan kaki lebih tinggi dari kepala</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>Mitos dan fakta tentang donor darah</span>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Mitos:</strong> Donor darah bisa bikin ketagihan<br>
+                            <strong>Fakta:</strong> Donor darah tidak menyebabkan ketagihan. Yang membuat orang rutin donor adalah kesadaran untuk membantu sesama.</p>
+                            
+                            <p><strong>Mitos:</strong> Donor darah bisa bikin gemuk<br>
+                            <strong>Fakta:</strong> Donor darah tidak mempengaruhi berat badan. Kenaikan berat badan setelah donor biasanya karena makan berlebihan setelah donor.</p>
+                            
+                            <p><strong>Mitos:</strong> Orang kurus tidak boleh donor darah<br>
+                            <strong>Fakta:</strong> Yang penting adalah berat badan minimal 45 kg, bukan postur tubuh.</p>
+                            
+                            <p><strong>Mitos:</strong> Donor darah itu menyakitkan<br>
+                            <strong>Fakta:</strong> Rasa sakit hanya seperti dicubit saat jarum dimasukkan, dan hanya berlangsung beberapa detik.</p>
+                            
+                            <p><strong>Mitos:</strong> Donor darah bisa menularkan penyakit<br>
+                            <strong>Fakta:</strong> Semua peralatan donor darah steril dan sekali pakai, sehingga sangat aman.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section" id="contact-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Kontak & Bantuan</h2>
+                </div>
+
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <h3>Hubungi Kami</h3>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4>Alamat</h4>
+                                <p>Jl. Kesehatan No. 123, Jakarta Pusat 10110</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div>
+                                <h4>Telepon</h4>
+                                <p>(021) 1234567</p>
+                                <p>0812-3456-7890 (24 jam)</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>info@donordarah.id</p>
+                                <p>bantuan@donordarah.id</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4>Jam Operasional</h4>
+                                <p>Senin-Jumat: 08:00 - 17:00</p>
+                                <p>Sabtu: 08:00 - 15:00</p>
+                                <p>Minggu: Tutup</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <h3>Kirim Pesan</h3>
+                        <form id="contact-form">
+                            <div class="form-group">
+                                <label for="contact-name">Nama Lengkap</label>
+                                <input type="text" id="contact-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Email</label>
+                                <input type="email" id="contact-email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-subject">Subjek</label>
+                                <input type="text" id="contact-subject" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Pesan</label>
+                                <textarea id="contact-message" class="form-control" rows="5" required></textarea>
+                            </div>
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-primary">Kirim Pesan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-title">Masuk ke Akun Anda</h2>
+            </div>
+            <div class="tabs">
+                <div class="tab active" id="login-tab">Masuk</div>
+                <div class="tab" id="register-tab">Daftar</div>
+            </div>
+            <div class="tab-content active" id="login-content">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" required>
+                        <div class="error-message" id="login-email-error">Masukkan email yang valid</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                        <div class="error-message" id="login-password-error">Password harus diisi</div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary">Masuk</button>
+                        <p>Belum punya akun? <a href="#" id="show-register">Daftar sekarang</a></p>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-content" id="register-content">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Nama Lengkap</label>
+                        <input type="text" id="register-name" class="form-control" required>
+                        <div class="error-message" id="register-name-error">Nama harus diisi</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-control" required>
+                        <div class="error-message" id="register-email-error">Masukkan email yang valid</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" class="form-control" required>
+                        <div class="error-message" id="register-password-error">Password minimal 8 karakter</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Konfirmasi Password</label>
+                        <input type="password" id="register-confirm-password" class="form-control" required>
+                        <div class="error-message" id="register-confirm-error">Password tidak cocok</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-blood-type">Golongan Darah</label>
+                        <select id="register-blood-type" class="form-control" required>
+                            <option value="">Pilih Golongan Darah</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                        <div class="error-message" id="register-blood-error">Pilih golongan darah</div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary">Daftar</button>
+                        <p>Sudah punya akun? <a href="#" id="show-login">Masuk sekarang</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Chat Button -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="language-selector" id="language-selector">
+        <i class="fas fa-globe"></i>
+        <div class="language-menu" id="language-menu">
+            <div class="language-option" data-lang="id">Indonesia</div>
+            <div class="language-option" data-lang="en">English</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-column">
+                    <h3>DonorDarah.id</h3>
+                    <p>Platform digital untuk memudahkan proses donor darah dan menghubungkan pendonor dengan mereka yang membutuhkan.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Menu</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" data-section="home">Beranda</a></li>
+                        <li><a href="#" data-section="donor-search">Cari Pendonor</a></li>
+                        <li><a href="#" data-section="blood-request">Permintaan Darah</a></li>
+                        <li><a href="#" data-section="map">Lokasi & Event</a></li>
+                        <li><a href="#" data-section="faq">Edukasi</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Bantuan</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" data-section="faq">FAQ</a></li>
+                        <li><a href="#" data-section="contact">Kontak Kami</a></li>
+                        <li><a href="#">Syarat & Ketentuan</a></li>
+                        <li><a href="#">Kebijakan Privasi</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Mitra</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Palang Merah Indonesia</a></li>
+                        <li><a href="#">Kementerian Kesehatan</a></li>
+                        <li><a href="#">Rumah Sakit Mitra</a></li>
+                        <li><a href="#">Komunitas Donor Darah</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 DonorDarah.id - All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const activeSection = document.getElementById(`${sectionId}-section`);
+            if (activeSection) {
+                activeSection.style.display = 'block';
+            }
+            
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Close mobile menu if open
+            mobileMenu.classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.dataset.section;
+                showSection(sectionId);
+            });
+        });
+
+        // Show home section by default
+        showSection('home');
+
+        // Auth Modal
+        const authModal = document.getElementById('auth-modal');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const mobileLoginBtn = document.getElementById('mobile-login-btn');
+        const mobileRegisterBtn = document.getElementById('mobile-register-btn');
+        const closeModal = document.getElementById('close-modal');
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginContent = document.getElementById('login-content');
+        const registerContent = document.getElementById('register-content');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+
+        function openModal(tab = 'login') {
+            authModal.classList.add('active');
+            
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginContent.classList.add('active');
+                registerContent.classList.remove('active');
+                document.getElementById('modal-title').textContent = 'Masuk ke Akun Anda';
+            } else {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerContent.classList.add('active');
+                loginContent.classList.remove('active');
+                document.getElementById('modal-title').textContent = 'Buat Akun Baru';
+            }
+        }
+
+        loginBtn.addEventListener('click', () => openModal('login'));
+        registerBtn.addEventListener('click', () => openModal('register'));
+        mobileLoginBtn.addEventListener('click', () => {
+            openModal('login');
+            mobileMenu.classList.remove('active');
+        });
+        mobileRegisterBtn.addEventListener('click', () => {
+            openModal('register');
+            mobileMenu.classList.remove('active');
+        });
+        closeModal.addEventListener('click', () => authModal.classList.remove('active'));
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('register');
+        });
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('login');
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.remove('active');
+            }
+        });
+
+        // Form Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Login Form
+        const loginForm = document.getElementById('login-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const loginEmailError = document.getElementById('login-email-error');
+        const loginPasswordError = document.getElementById('login-password-error');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+            
+            // Validate email
+            if (!validateEmail(loginEmail.value)) {
+                loginEmailError.style.display = 'block';
+                isValid = false;
+            } else {
+                loginEmailError.style.display = 'none';
+            }
+            
+            // Validate password
+            if (loginPassword.value.length < 1) {
+                loginPasswordError.style.display = 'block';
+                isValid = false;
+            } else {
+                loginPasswordError.style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Simulate login
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const user = users.find(u => u.email === loginEmail.value && u.password === loginPassword.value);
+                
+                if (user) {
+                    // Store logged in user
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Close modal
+                    authModal.classList.remove('active');
+                    
+                    // Show profile section
+                    showSection('profile');
+                    
+                    // Update profile info
+                    updateProfileInfo(user);
+                    
+                    // Show user menu
+                    showUserMenu();
+                } else {
+                    alert('Email atau password salah');
+                }
+            }
+        });
+
+        // Register Form
+        const registerForm = document.getElementById('register-form');
+        const registerName = document.getElementById('register-name');
+        const registerEmail = document.getElementById('register-email');
+        const registerPassword = document.getElementById('register-password');
+        const registerConfirmPassword = document.getElementById('register-confirm-password');
+        const registerBloodType = document.getElementById('register-blood-type');
+        const registerNameError = document.getElementById('register-name-error');
+        const registerEmailError = document.getElementById('register-email-error');
+        const registerPasswordError = document.getElementById('register-password-error');
+        const registerConfirmError = document.getElementById('register-confirm-error');
+        const registerBloodError = document.getElementById('register-blood-error');
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+            
+            // Validate name
+            if (registerName.value.length < 1) {
+                registerNameError.style.display = 'block';
+                isValid = false;
+            } else {
+                registerNameError.style.display = 'none';
+            }
+            
+            // Validate email
+            if (!validateEmail(registerEmail.value)) {
+                registerEmailError.style.display = 'block';
+                isValid = false;
+            } else {
+                registerEmailError.style.display = 'none';
+            }
+            
+            // Validate password
+            if (registerPassword.value.length < 8) {
+                registerPasswordError.style.display = 'block';
+                isValid = false;
+            } else {
+                registerPasswordError.style.display = 'none';
+            }
+            
+            // Validate confirm password
+            if (registerPassword.value !== registerConfirmPassword.value) {
+                registerConfirmError.style.display = 'block';
+                isValid = false;
+            } else {
+                registerConfirmError.style.display = 'none';
+            }
+            
+            // Validate blood type
+            if (!registerBloodType.value) {
+                registerBloodError.style.display = 'block';
+                isValid = false;
+            } else {
+                registerBloodError.style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Check if email already exists
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const emailExists = users.some(u => u.email === registerEmail.value);
+                
+                if (emailExists) {
+                    alert('Email sudah terdaftar');
+                } else {
+                    // Create new user
+                    const newUser = {
+                        id: Date.now(),
+                        name: registerName.value,
+                        email: registerEmail.value,
+                        password: registerPassword.value,
+                        bloodType: registerBloodType.value,
+                        lastDonation: null,
+                        totalDonations: 0,
+                        location: 'Jakarta',
+                        weight: '68 kg',
+                        gender: 'Laki-laki',
+                        birthdate: '15 Januari 1990',
+                        address: 'Jl. Contoh No. 123, Jakarta Selatan',
+                        contact: '0812-3456-7890'
+                    };
+                    
+                    // Save user
+                    users.push(newUser);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    
+                    // Log in the new user
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    
+                    // Close modal
+                    authModal.classList.remove('active');
+                    
+                    // Show profile section
+                    showSection('profile');
+                    
+                    // Update profile info
+                    updateProfileInfo(newUser);
+                    
+                    // Show user menu
+                    showUserMenu();
+                    
+                    alert('Pendaftaran berhasil!');
+                }
+            }
+        });
+
+        // Check if user is logged in
+        function checkAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser) {
+                showUserMenu();
+                updateProfileInfo(currentUser);
+            }
+        }
+
+        // Show user menu when logged in
+        function showUserMenu() {
+            const authButtons = document.querySelector('.auth-buttons');
+            const mobileAuthButtons = document.querySelectorAll('#mobile-menu li a[data-section]');
+            
+            if (authButtons) {
+                authButtons.innerHTML = `
+                    <button class="btn btn-outline" id="profile-btn">
+                        <i class="fas fa-user"></i> Profil
+                    </button>
+                    <button class="btn btn-primary" id="logout-btn">Keluar</button>
+                `;
+                
+                document.getElementById('profile-btn').addEventListener('click', () => {
+                    showSection('profile');
+                });
+                
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    localStorage.removeItem('currentUser');
+                    location.reload();
+                });
+            }
+            
+            // Update mobile menu
+            if (mobileAuthButtons.length > 0) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.innerHTML = `
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="home">Beranda</a></li>
+                        <li><a href="#" class="nav-link" data-section="donor-search">Cari Pendonor</a></li>
+                        <li><a href="#" class="nav-link" data-section="blood-request">Permintaan Darah</a></li>
+                        <li><a href="#" class="nav-link" data-section="map">Lokasi & Event</a></li>
+                        <li><a href="#" class="nav-link" data-section="faq">Edukasi</a></li>
+                        <li><a href="#" class="nav-link" data-section="profile">Profil</a></li>
+                        <li><a href="#" class="nav-link" id="mobile-logout-btn">Keluar</a></li>
+                    </ul>
+                `;
+                
+                // Add event listeners to new mobile menu items
+                document.querySelectorAll('#mobile-menu .nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        if (link.dataset.section) {
+                            e.preventDefault();
+                            showSection(link.dataset.section);
+                            mobileMenu.classList.remove('active');
+                        }
+                    });
+                });
+                
+                document.getElementById('mobile-logout-btn').addEventListener('click', () => {
+                    localStorage.removeItem('currentUser');
+                    location.reload();
+                });
+            }
+        }
+
+        // Update profile information
+        function updateProfileInfo(user) {
+            if (!user) return;
+            
+            // Profile header
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-blood-type').textContent = `Golongan Darah: ${user.bloodType}`;
+            
+            // Avatar
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('profile-avatar').textContent = initials;
+            
+            // Personal info
+            document.getElementById('profile-fullname').textContent = user.name;
+            document.getElementById('profile-birthdate').textContent = `${user.birthdate} (${calculateAge(user.birthdate)} tahun)`;
+            document.getElementById('profile-gender').textContent = user.gender;
+            document.getElementById('profile-address').textContent = user.address;
+            document.getElementById('profile-contact').textContent = `${user.contact} | ${user.email}`;
+            
+            // Health info
+            document.getElementById('profile-blood').textContent = user.bloodType;
+            document.getElementById('profile-weight').textContent = user.weight;
+            document.getElementById('profile-medical-history').textContent = 'Tidak ada';
+            document.getElementById('profile-last-donation').textContent = user.lastDonation || 'Belum pernah donor';
+            document.getElementById('profile-total-donations').textContent = `${user.totalDonations || 0} kali`;
+            
+            // Update countdown
+            updateCountdown(user.lastDonation);
+            
+            // Generate QR code
+            generateQRCode(user);
+        }
+
+        // Calculate age from birthdate string
+        function calculateAge(birthdate) {
+            // Simple calculation for demo
+            return 33;
+        }
+
+        // Update countdown timer
+        function updateCountdown(lastDonation) {
+            const countdownElement = document.getElementById('countdown');
+            
+            if (!lastDonation) {
+                countdownElement.textContent = 'Anda bisa donor sekarang';
+                return;
+            }
+            
+            // For demo purposes, we'll use a fixed date
+            const lastDonationDate = new Date('2023-05-15');
+            const nextDonationDate = new Date(lastDonationDate);
+            nextDonationDate.setDate(nextDonationDate.getDate() + 75);
+            
+            const today = new Date();
+            const diffTime = nextDonationDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays <= 0) {
+                countdownElement.textContent = 'Anda bisa donor sekarang';
+            } else {
+                countdownElement.textContent = `${diffDays} hari lagi`;
+            }
+        }
+
+        // Generate QR Code
+        function generateQRCode(user) {
+            const qrContainer = document.getElementById('qrcode-container');
+            qrContainer.innerHTML = '';
+            
+            const userData = {
+                name: user.name,
+                bloodType: user.bloodType,
+                lastDonation: user.lastDonation || 'Belum pernah donor',
+                contact: user.contact
+            };
+            
+            QRCode.toCanvas(qrContainer, JSON.stringify(userData), { width: 200 }, (error) => {
+                if (error) console.error(error);
+            });
+            
+            // Download QR code button
+            document.getElementById('download-qr-btn').addEventListener('click', () => {
+                const canvas = qrContainer.querySelector('canvas');
+                const link = document.createElement('a');
+                link.download = `donor-darah-${user.name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Donor Search
+        const searchBtn = document.getElementById('search-btn');
+        const searchResults = document.getElementById('search-results');
+
+        // Sample donor data
+        const donors = [
+            {
+                id: 1,
+                name: "Sarah Budi",
+                bloodType: "A+",
+                location: "Jakarta",
+                age: 28,
+                gender: "Perempuan",
+                lastDonation: "2023-06-10",
+                available: true,
+                totalDonations: 8
+            },
+            {
+                id: 2,
+                name: "Andi Wijaya",
+                bloodType: "B-",
+                location: "Bandung",
+                age: 35,
+                gender: "Laki-laki",
+                lastDonation: "2023-05-15",
+                available: false,
+                totalDonations: 7
+            },
+            {
+                id: 3,
+                name: "Dian Sari",
+                bloodType: "O+",
+                location: "Jakarta",
+                age: 31,
+                gender: "Perempuan",
+                lastDonation: "2023-06-20",
+                available: true,
+                totalDonations: 6
+            },
+            {
+                id: 4,
+                name: "Rina Susanti",
+                bloodType: "AB+",
+                location: "Surabaya",
+                age: 25,
+                gender: "Perempuan",
+                lastDonation: "2023-04-10",
+                available: true,
+                totalDonations: 4
+            },
+            {
+                id: 5,
+                name: "Budi Santoso",
+                bloodType: "A-",
+                location: "Yogyakarta",
+                age: 40,
+                gender: "Laki-laki",
+                lastDonation: "2023-06-05",
+                available: true,
+                totalDonations: 10
+            },
+            {
+                id: 6,
+                name: "Eko Prasetyo",
+                bloodType: "O-",
+                location: "Bali",
+                age: 29,
+                gender: "Laki-laki",
+                lastDonation: "2023-03-20",
+                available: false,
+                totalDonations: 5
+            }
+        ];
+
+        function renderDonors(donorList) {
+            searchResults.innerHTML = '';
+            
+            if (donorList.length === 0) {
+                searchResults.innerHTML = '<p>Tidak ada pendonor yang ditemukan</p>';
+                return;
+            }
+            
+            donorList.forEach(donor => {
+                const donorCard = document.createElement('div');
+                donorCard.className = 'donor-card';
+                
+                const today = new Date();
+                const lastDonationDate = new Date(donor.lastDonation);
+                const diffTime = today - lastDonationDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const canDonate = diffDays >= 75;
+                
+                donorCard.innerHTML = `
+                    <div class="donor-card-header">
+                        <div class="donor-blood-type">${donor.bloodType}</div>
+                        <div>${donor.location}</div>
+                    </div>
+                    <div class="donor-card-body">
+                        <div class="donor-info">
+                            <h3>${donor.name}</h3>
+                            <p><i class="fas fa-user"></i> ${donor.gender}, ${donor.age} tahun</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${donor.location}</p>
+                            <p><i class="fas fa-tint"></i> Total donor: ${donor.totalDonations} kali</p>
+                            <p><i class="fas fa-calendar-alt"></i> Terakhir donor: ${formatDate(donor.lastDonation)}</p>
+                            <span class="donor-status-badge ${canDonate ? 'status-available' : 'status-unavailable'}">
+                                ${canDonate ? 'Tersedia Donor' : 'Belum Bisa Donor'}
+                            </span>
+                        </div>
+                        <div class="donor-actions">
+                            <button class="btn btn-outline" data-id="${donor.id}">
+                                <i class="fas fa-envelope"></i> Hubungi
+                            </button>
+                            <button class="btn btn-primary" data-id="${donor.id}">
+                                <i class="fas fa-heart"></i> Donor
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                searchResults.appendChild(donorCard);
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const bloodTypeFilter = document.getElementById('blood-type-filter').value;
+            const locationFilter = document.getElementById('location-filter').value;
+            const availabilityFilter = document.getElementById('availability-filter').value;
+            
+            let filteredDonors = [...donors];
+            
+            if (bloodTypeFilter) {
+                filteredDonors = filteredDonors.filter(d => d.bloodType === bloodTypeFilter);
+            }
+            
+            if (locationFilter) {
+                filteredDonors = filteredDonors.filter(d => d.location.toLowerCase() === locationFilter);
+            }
+            
+            if (availabilityFilter) {
+                const today = new Date();
+                if (availabilityFilter === 'available') {
+                    filteredDonors = filteredDonors.filter(d => {
+                        const lastDonationDate = new Date(d.lastDonation);
+                        const diffTime = today - lastDonationDate;
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        return diffDays >= 75;
+                    });
+                } else {
+                    filteredDonors = filteredDonors.filter(d => {
+                        const lastDonationDate = new Date(d.lastDonation);
+                        const diffTime = today - lastDonationDate;
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        return diffDays < 75;
+                    });
+                }
+            }
+            
+            renderDonors(filteredDonors);
+        });
+
+        // Initial render
+        renderDonors(donors);
+
+        // Blood Request Form
+        const bloodRequestForm = document.getElementById('blood-request-form');
+        const requestHistoryList = document.getElementById('request-history-list');
+
+        // Sample request data
+        let requests = JSON.parse(localStorage.getItem('blood-requests')) || [
+            {
+                id: 1,
+                bloodType: "A+",
+                quantity: 2,
+                hospital: "RS Umum Daerah Kota",
+                patient: "Ibu Sinta",
+                diagnosis: "Operasi Jantung",
+                contact: "0812-3456-7890",
+                urgency: "urgent",
+                status: "completed",
+                date: "2023-05-10"
+            },
+            {
+                id: 2,
+                bloodType: "AB-",
+                quantity: 1,
+                hospital: "RS Siloam",
+                patient: "Bayi prematur",
+                diagnosis: "Transfusi darah",
+                contact: "0813-4567-8901",
+                urgency: "emergency",
+                status: "completed",
+                date: "2023-04-15"
+            },
+            {
+                id: 3,
+                bloodType: "O+",
+                quantity: 3,
+                hospital: "RS Harapan Kita",
+                patient: "Bapak Rudi",
+                diagnosis: "Kecelakaan lalu lintas",
+                contact: "0814-5678-9012",
+                urgency: "emergency",
+                status: "pending",
+                date: "2023-06-20"
+            }
+        ];
+
+        function renderRequestHistory() {
+            requestHistoryList.innerHTML = '';
+            
+            if (requests.length === 0) {
+                requestHistoryList.innerHTML = '<p>Belum ada riwayat permintaan darah</p>';
+                return;
+            }
+            
+            requests.forEach(request => {
+                const requestItem = document.createElement('div');
+                requestItem.className = 'request-item';
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (request.status) {
+                    case 'completed':
+                        statusClass = 'status-completed';
+                        statusText = 'Selesai';
+                        break;
+                    case 'pending':
+                        statusClass = 'status-pending';
+                        statusText = 'Menunggu';
+                        break;
+                    case 'rejected':
+                        statusClass = 'status-rejected';
+                        statusText = 'Ditolak';
+                        break;
+                }
+                
+                requestItem.innerHTML = `
+                    <div class="request-item-header">
+                        <span class="request-blood-type">${request.bloodType} (${request.quantity} kantong)</span>
+                        <span class="request-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="request-item-details">
+                        <p><strong>Rumah Sakit:</strong> ${request.hospital}</p>
+                        ${request.patient ? `<p><strong>Pasien:</strong> ${request.patient}</p>` : ''}
+                        ${request.diagnosis ? `<p><strong>Diagnosis:</strong> ${request.diagnosis}</p>` : ''}
+                        <p><strong>Kontak:</strong> ${request.contact}</p>
+                        <p><strong>Tanggal:</strong> ${formatDate(request.date)}</p>
+                    </div>
+                `;
+                
+                requestHistoryList.appendChild(requestItem);
+            });
+        }
+
+        bloodRequestForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validate form
+            let isValid = true;
+            
+            const bloodType = document.getElementById('request-blood-type');
+            const quantity = document.getElementById('request-quantity');
+            const hospital = document.getElementById('request-hospital');
+            const contact = document.getElementById('request-contact');
+            
+            const bloodTypeError = document.getElementById('blood-type-error');
+            const quantityError = document.getElementById('quantity-error');
+            const hospitalError = document.getElementById('hospital-error');
+            const contactError = document.getElementById('contact-error');
+            
+            if (!bloodType.value) {
+                bloodTypeError.style.display = 'block';
+                isValid = false;
+            } else {
+                bloodTypeError.style.display = 'none';
+            }
+            
+            if (!quantity.value || quantity.value < 1) {
+                quantityError.style.display = 'block';
+                isValid = false;
+            } else {
+                quantityError.style.display = 'none';
+            }
+            
+            if (!hospital.value) {
+                hospitalError.style.display = 'block';
+                isValid = false;
+            } else {
+                hospitalError.style.display = 'none';
+            }
+            
+            if (!contact.value) {
+                contactError.style.display = 'block';
+                isValid = false;
+            } else {
+                contactError.style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Create new request
+                const newRequest = {
+                    id: Date.now(),
+                    bloodType: bloodType.value,
+                    quantity: quantity.value,
+                    hospital: hospital.value,
+                    patient: document.getElementById('request-patient').value || '',
+                    diagnosis: document.getElementById('request-diagnosis').value || '',
+                    contact: contact.value,
+                    urgency: document.getElementById('request-urgency').value,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0]
+                };
+                
+                // Add to requests
+                requests.unshift(newRequest);
+                
+                // Save to localStorage
+                localStorage.setItem('blood-requests', JSON.stringify(requests));
+                
+                // Render updated history
+                renderRequestHistory();
+                
+                // Reset form
+                bloodRequestForm.reset();
+                
+                // Show success message
+                alert('Permintaan darah berhasil dikirim!');
+            }
+        });
+
+        // Initial render
+        renderRequestHistory();
+
+        // Map Section
+        let map;
+
+        function initMap() {
+            map = L.map('donor-map').setView([-6.2088, 106.8456], 12); // Default to Jakarta
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add donor markers
+            donors.forEach(donor => {
+                // Generate random coordinates near Jakarta for demo
+                const lat = -6.2088 + (Math.random() * 0.1 - 0.05);
+                const lng = 106.8456 + (Math.random() * 0.1 - 0.05);
+                
+                const today = new Date();
+                const lastDonationDate = new Date(donor.lastDonation);
+                const diffTime = today - lastDonationDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const canDonate = diffDays >= 75;
+                
+                const marker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: `marker-icon ${canDonate ? 'available' : 'unavailable'}`,
+                        html: `<div class="marker-content">${donor.bloodType}</div>`,
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <h3>${donor.name}</h3>
+                    <p><strong>Golongan Darah:</strong> ${donor.bloodType}</p>
+                    <p><strong>Lokasi:</strong> ${donor.location}</p>
+                    <p><strong>Status:</strong> ${canDonate ? 'Tersedia Donor' : 'Belum Bisa Donor'}</p>
+                    <p><strong>Terakhir Donor:</strong> ${formatDate(donor.lastDonation)}</p>
+                `);
+            });
+            
+            // Add event markers
+            const events = [
+                {
+                    name: "Donor Darah Bulanan PMI",
+                    location: "Kantor PMI Jakarta Pusat",
+                    date: "2023-08-15",
+                    time: "08:00 - 15:00",
+                    lat: -6.1825,
+                    lng: 106.8329
+                },
+                {
+                    name: "Blood For Life",
+                    location: "Mall Central Park, Jakarta Barat",
+                    date: "2023-08-25",
+                    time: "10:00 - 18:00",
+                    lat: -6.1777,
+                    lng: 106.7899
+                }
+            ];
+            
+            events.forEach(event => {
+                const marker = L.marker([event.lat, event.lng], {
+                    icon: L.divIcon({
+                        className: 'event-marker',
+                        html: '<i class="fas fa-calendar-alt"></i>',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <h3>${event.name}</h3>
+                    <p><strong>Lokasi:</strong> ${event.location}</p>
+                    <p><strong>Tanggal:</strong> ${formatDate(event.date)}</p>
+                    <p><strong>Waktu:</strong> ${event.time}</p>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Daftar Event</button>
+                `);
+            });
+            
+            // Show/hide layers
+            document.getElementById('show-donors-btn').addEventListener('click', () => {
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        if (layer.options.icon.options.className.includes('marker-icon')) {
+                            layer.addTo(map);
+                        }
+                    }
+                });
+            });
+            
+            document.getElementById('show-events-btn').addEventListener('click', () => {
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        if (layer.options.icon.options.className.includes('event-marker')) {
+                            layer.addTo(map);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize map when section is shown
+        document.getElementById('map-section').addEventListener('click', () => {
+            if (!map) {
+                initMap();
+            }
+        });
+
+        // Charts
+        function initCharts() {
+            // Blood type chart
+            const bloodTypeCtx = document.getElementById('blood-type-chart').getContext('2d');
+            const bloodTypeChart = new Chart(bloodTypeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                    datasets: [{
+                        label: 'Permintaan Darah',
+                        data: [120, 45, 95, 30, 40, 15, 150, 50],
+                        backgroundColor: '#e63946',
+                        borderColor: '#d00000',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Region chart
+            const regionCtx = document.getElementById('region-chart').getContext('2d');
+            const regionChart = new Chart(regionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Bali'],
+                    datasets: [{
+                        label: 'Donor Aktif',
+                        data: [350, 180, 220, 120, 90],
+                        backgroundColor: [
+                            '#457b9d',
+                            '#a8dadc',
+                            '#1d3557',
+                            '#e63946',
+                            '#f1faee'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+
+        // Initialize charts when section is shown
+        document.getElementById('statistics-section').addEventListener('click', () => {
+            if (!document.getElementById('blood-type-chart')._chart) {
+                initCharts();
+            }
+        });
+
+        // Chat functionality
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+
+        function addMessage(content, isReceived) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isReceived ? 'received' : 'sent'}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">${content}</div>
+                <div class="message-info">
+                    <span>${isReceived ? 'Sarah Budi' : 'Anda'}</span>
+                    <span>${timeString}</span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendMessageBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, false);
+                chatInput.value = '';
+                
+                // Simulate reply after 1-3 seconds
+                setTimeout(() => {
+                    const replies = [
+                        "Terima kasih atas informasinya",
+                        "Saya akan menunggu kabar dari Anda",
+                        "Baik, saya mengerti",
+                        "Apakah ada informasi tambahan?",
+                        "Sangat membantu, terima kasih"
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    addMessage(randomReply, true);
+                }, 1000 + Math.random() * 2000);
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessageBtn.click();
+            }
+        });
+
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        function toggleTheme() {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? '' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            
+            // Update icon
+            const icon = themeToggle.querySelector('i');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.setAttribute('data-theme', 'dark');
+            const icon = themeToggle.querySelector('i');
+            icon.className = 'fas fa-sun';
+        }
+
+        // Language Selector
+        const languageSelector = document.getElementById('language-selector');
+        const languageMenu = document.getElementById('language-menu');
+
+        languageSelector.addEventListener('click', () => {
+            languageMenu.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // In a real app, this would change the language
+                alert(`Bahasa diubah ke ${option.textContent}`);
+                languageMenu.classList.remove('active');
+            });
+        });
+
+        // Accordion
+        const accordionItems = document.querySelectorAll('.accordion-item');
+
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            
+            header.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+
+        // Donate Now Button
+        document.getElementById('donate-now-btn').addEventListener('click', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser) {
+                // Check if user can donate
+                const lastDonationDate = currentUser.lastDonation ? new Date(currentUser.lastDonation) : null;
+                const today = new Date();
+                
+                if (lastDonationDate) {
+                    const diffTime = today - lastDonationDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 75) {
+                        alert(`Anda belum bisa donor darah. Silakan tunggu ${75 - diffDays} hari lagi.`);
+                        return;
+                    }
+                }
+                
+                // Show donor registration form or map
+                showSection('map');
+            } else {
+                openModal('login');
+            }
+        });
+
+        // Initialize
+        checkAuth();
+    </script>
+</body>
+</html>
